@@ -1,38 +1,19 @@
 var express = require('express')
-var app = express()
-var MongoClient = require('mongodb').MongoClient;
-var bodyParser = require('body-parser')
-var url = 'mongodb://localhost:27017/myproject';
-var jsonParser = bodyParser.json()
-app.use(jsonParser)
-MongoClient.connect(url, function(err, db) {
-  console.log(err)
-  console.log("Connected successfully to server");
+var app = express();
+var bodyParser = require('body-parser');
+const db = require('./app/config/db');
+const router = require('./app/config/router');
+var jsonParser = bodyParser.json({limit: '50mb'});
 
-  app.get('/articles', function (req, res) {
-    var collection = db.collection('articles');
-    collection.find({}).toArray(function(err, docs) {
-      const articles = docs.map(doc => {return Object.assign({}, doc, {id: doc._id})});
-      res.json(articles)
-    });
-  })
+db.setup(err => {
+  if (err) {
+    throw err;
+  }
 
-  app.post('/articles', function (req, res) {
-    const articles = req.body.articles.map(article => {return {title, body, date, source} = article})
-    var collection = db.collection('articles');
-    // Insert some documents
-    collection.insertMany(articles, (err, result) => {
-      if (err) {    return res.json({error: err})}
-      return res.json(articles)
-    })
-  })
-
-
+  app.use(jsonParser)
+  app.use(router)
 
   app.listen(8080, function () {
-    console.log('Example app listening on port 8080!')
-
-
-
+    console.log('App listening on port 8080!')
   })
-});
+})
