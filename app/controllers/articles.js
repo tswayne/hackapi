@@ -1,3 +1,5 @@
+const indexer = require('../lib/indexer')
+
 module.exports.getArticles = function (req, res) {
   var collection = require('../config/db').db.collection('articles');
   collection.find({}).toArray(function(err, docs) {
@@ -9,9 +11,21 @@ module.exports.getArticles = function (req, res) {
 module.exports.createArticles = function (req, res) {
   const articles = req.body.articles.map(article => {return {title, body, date, source, tags} = article})
   var collection = require('../config/db').db.collection('articles');
-  // Insert some documents
   collection.insertMany(articles, (err, result) => {
     if (err) {    return res.json({error: err})}
-    return res.json(articles)
+    const articleDocs = articles.map(article => {
+      return {
+        id: article._id,
+        title: article.title,
+        body: article.body,
+        date: article.date,
+        source: article.source,
+        tags: article.tags
+      }
+    })
+    indexer.index(articleDocs, (eErr) => {
+      if (err) {return res.json({error: eErr})}
+      return res.json(articleDocs)
+    })
   })
 }
