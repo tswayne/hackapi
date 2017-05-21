@@ -2,7 +2,7 @@ var elasticsearch = require('elasticsearch');
 
 module.exports.setup = function(cb) {
   const client = new elasticsearch.Client({
-    host: 'localhost:9200',
+    host: '127.0.0.1:9200',
     log: 'trace'
   });
   client.ping({

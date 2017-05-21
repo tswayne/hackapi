@@ -16,6 +16,9 @@ module.exports = function(query, cb) {
       }
     }
   }, function (error, response) {
-    cb(error, response)
+      const articles = response.hits.hits.map(doc => {
+        return doc._source
+      })
+    cb(error, articles)
   });
 }
