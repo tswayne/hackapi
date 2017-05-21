@@ -9,7 +9,7 @@ module.exports.getArticles = function (req, res) {
 };
 
 module.exports.createArticles = function (req, res) {
-  const articles = req.body.articles.map(article => {return {title, body, date, source, tags} = article})
+  const articles = req.body.articles.map(article => {return {title, body, summary, date, source, tags} = article})
   var collection = require('../config/db').db.collection('articles');
   collection.insertMany(articles, (err, result) => {
     if (err) {    return res.json({error: err})}
@@ -18,6 +18,7 @@ module.exports.createArticles = function (req, res) {
         id: article._id,
         title: article.title,
         body: article.body,
+        summary: article.summary,
         date: article.date,
         source: article.source,
         tags: article.tags
